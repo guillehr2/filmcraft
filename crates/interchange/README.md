@@ -45,6 +45,10 @@ linked again. Transitions, effects, title clips, speed changes, nested timelines
 and bin folders are not imported: the report names each one, and a skipped clip leaves a gap so
 the rest of the track keeps its timing. Details in the `mlt` module docs.
 
+**Invariant — Unicode media URLs:** file URL prefix probes must not panic when their byte boundary
+falls inside a UTF-8 character. Timeline importers use the shared converter; `tests/it/file_urls.rs`
+checks expected Unicode paths through the public converter, resolver and EDL importer.
+
 ## AAF and OMF
 
 `comp` holds a format-neutral mob-style model (compositions of slots whose sequences of fillers,
@@ -102,7 +106,7 @@ OMF carries no video at all.
 
 ## Tests
 
-- `tests/aaf_omf.rs`: AAF round trips at 25, 29.97 DF, 23.976 and 59.94 DF (clips, gaps,
+- `tests/it/aaf_omf.rs`: AAF round trips at 25, 29.97 DF, 23.976 and 59.94 DF (clips, gaps,
   two-sided and one-sided transitions, links, markers, start timecodes, constant and keyframed
   gain, media markers and timecode); 512-byte sectors; breakout to mono; embedded trimmed audio
   (sample data and source offsets); separate consolidated files with a video mixdown; OMF round
@@ -110,14 +114,14 @@ OMF carries no video at all.
   random corruption never panic. Nested sequences: AAF round trips as compositions (nests in
   nests, a nest used twice, another frame and sample rate, breakout to mono), OMF with the
   rendered sound, the audio needs of nests, a sequence inside itself.
-- `tests/mlt.rs`: a synthetic Kdenlive project shaped like the files Kdenlive writes (black
+- `tests/it/mlt.rs`: a synthetic Kdenlive project shaped like the files Kdenlive writes (black
   background, a tractor of two playlists per track, `kdenlive:audio_track`, internal track
   filters, the project tractor wrapping the sequence): two video tracks and one audio track with
   blanks and in/out trims in clock, frame and SMPTE forms, track names, lock and mute, linked
   audio and video, colour and title clips, the bin; a plain MLT document without a profile;
   missing and unusable media leaving gaps with report entries; malformed XML; hostile numbers,
   cyclic and deeply nested tractors; truncation and byte corruption under `catch_unwind`.
-- `tests/uncarried_clips.rs`: every format's export report names each graphic clip and adjustment
+- `tests/it/uncarried_clips.rs`: every format's export report names each graphic clip and adjustment
   layer once, as a warning; a sequence without them reports nothing; what a re-import gives back
   matches the report; the FCP7 XML import names a clip item whose file is not defined.
 - `src/aaf/tests.rs`: written files checked against the required properties of every class

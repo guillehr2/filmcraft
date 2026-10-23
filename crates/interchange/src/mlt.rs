@@ -44,7 +44,7 @@ use filmcraft_project::{ItemId, Sequence, SequenceSettings, TrackItem, TrackKind
 use filmcraft_time::FrameRate;
 use roxmltree::{Node, NodeId};
 
-use crate::common::{Builder, MediaSpec, empty_sequence, file_name, kind_from_ext, resolve_path, settings_for};
+use crate::common::{Builder, MAX_IMPORTED_TRACKS, MediaSpec, empty_sequence, file_name, kind_from_ext, resolve_path, settings_for};
 use crate::xml::{children, elements};
 use crate::{Error, Format, ImportOptions, Imported, Report, Result};
 
@@ -420,6 +420,10 @@ impl<'a, 'i> Imp<'a, 'i, '_> {
         for rt in video.into_iter().chain(audio) {
             let kind = rt.kind;
             let index = seq.tracks(kind).len();
+            if index >= MAX_IMPORTED_TRACKS {
+                self.report.warn(format!("MLT {kind:?} tracks beyond {MAX_IMPORTED_TRACKS} were skipped"));
+                continue;
+            }
             let mut track = self.b.track(kind, index);
             if let Some(n) = rt.name {
                 track.name = n;
@@ -433,9 +437,15 @@ impl<'a, 'i> Imp<'a, 'i, '_> {
         }
         for (kind, index, clip) in overlapping {
             let (name, frame) = (clip.name.clone(), self.rate.frame_at(clip.start));
-            let at = self.b.place(&mut seq, kind, index.saturating_add(1), clip);
-            let on = seq.tracks(kind).get(at).map(|t| t.name.clone()).unwrap_or_default();
-            self.report.warn(format!("clip \"{name}\" at frame {frame} overlaps another on its track (a same-track mix): put on {on}"));
+            match self.b.place(&mut seq, kind, index.saturating_add(1), clip) {
+                Some(at) => {
+                    let on = seq.tracks(kind).get(at).map(|t| t.name.clone()).unwrap_or_default();
+                    self.report.warn(format!("clip \"{name}\" at frame {frame} overlaps another on its track (a same-track mix): put on {on}"));
+                }
+                None => self.report.warn(format!(
+                    "clip \"{name}\" at frame {frame} overlaps another on its track (a same-track mix) and was skipped: no room within the {MAX_IMPORTED_TRACKS}-track import limit"
+                )),
+            }
         }
         self.link(&mut seq);
         self.b.ensure_tracks(&mut seq, TrackKind::Video, 1);
