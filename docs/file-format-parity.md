@@ -22,7 +22,7 @@ only). "Tested" names the evidence.
 | EDL (CMX 3600) | read + write | yes | yes | tests | 85% |
 | OpenTimelineIO | read + write (26.0) | yes | yes | tests | 80% |
 | Avid Log Exchange (ALE) | write | no | yes | — | 70% |
-| Kdenlive project `.kdenlive` (MLT XML) | no | yes: tracks, clips, gaps, colour clips, linked audio / video; transitions, effects, titles, guides reported (#1089) | no | synthetic projects | ahead |
+| Kdenlive project `.kdenlive`, MLT XML `.mlt` | no (not in Adobe's supported-formats list) | yes: tracks, clips, gaps, colour clips, linked audio / video; transitions, effects, titles, guides reported (#1089) | no | synthetic projects | ahead |
 | Marker CSV / text | write | — | yes (#454) | — | 80% |
 | Selection as project | Premiere project | — | `.fcproj` only | — | 50% |
 | Templates (`.prproj` templates) | yes | — | our templates | — | 70% |

@@ -97,5 +97,11 @@ fn file_import_opens_a_kdenlive_project() {
     assert!(!dir.join("out.kdenlive").exists());
     // the Media Browser lists them with the projects it imports
     assert_eq!(media_browser::kind_of("edit.kdenlive"), Some("project"));
+    assert_eq!(media_browser::kind_of("edit.mlt"), Some("project"));
+    // a plain MLT document is imported too
+    let mlt = dir.join("edit.mlt");
+    std::fs::write(&mlt, PROJECT).unwrap();
+    let r = s.execute("file.import", json!({"paths": [mlt.to_string_lossy()]})).unwrap();
+    assert_eq!(r["documents"][0]["format"], "Kdenlive (MLT XML)", "{r}");
     let _ = std::fs::remove_dir_all(&dir);
 }

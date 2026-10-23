@@ -31,14 +31,17 @@ files Kdenlive writes, never from MLT or Kdenlive source (both GPL).
 
 ## Kdenlive projects
 
-Import only (`Format::Mlt`, `.kdenlive`). The timeline is the tractor `<mlt producer>` names, else
+Import only (`Format::Mlt`): `.kdenlive` projects and plain MLT documents (`.mlt`), and an `.xml`
+file whose root element is `<mlt>`. The timeline is the tractor `<mlt producer>` names, else
 the document's last tractor, looked through when it only wraps another one (a project tractor
 around a Kdenlive sequence). Each track (a playlist, or a tractor of playlists) becomes a FilmCraft track: entries
 are clips (`out` inclusive), blanks gaps; times are frame counts, clock values or SMPTE timecode.
 The profile gives the sequence settings; file producers and chains become media (relative paths
 resolve against `<mlt root>`), colour producers colour mattes, and the bin's clips are imported
 even when unused. A video clip and an audio clip with the same media over the same time are
-linked. Transitions, effects, title clips, speed changes, nested timelines, guides, clip markers
+linked. Kdenlive keeps its own clip groups in a project property whose format MLT doesn't
+document, so they are not read: a clip whose audio was cut apart and put back at the same time is
+linked again. Transitions, effects, title clips, speed changes, nested timelines, guides, clip markers
 and bin folders are not imported: the report names each one, and a skipped clip leaves a gap so
 the rest of the track keeps its timing. Details in the `mlt` module docs.
 

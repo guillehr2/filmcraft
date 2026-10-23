@@ -702,7 +702,7 @@ Video encoders implement `export::VideoEncoder`. Codec crates plug in with `regi
 `register_audio_encoder`.
 
 Timelines can be exchanged as EDL, FCP7 XML, FCPXML, OTIO, AAF or OMF, and read from Kdenlive
-projects (`.kdenlive`, MLT XML). `file.import` detects these formats and merges the result into the
+projects (`.kdenlive`, or MLT XML `.mlt`). `file.import` detects these formats and merges the result into the
 project as one undoable step (AAF / OMF embedded audio is written next to the document first). `file.import {replace: true}` starts from an empty project
 with the same name (`file.newProject`) so a headless import→export round-trip contains only the
 imported timeline. `file.exportInterchange`, `file.exportEdl`,

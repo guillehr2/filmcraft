@@ -485,6 +485,13 @@ fn detection_and_import_only() {
     assert_eq!(detect(b"<?xml version='1.0'?>\n<mlt LC_NUMERIC=\"C\"/>", None), Some(Format::Mlt));
     assert_eq!(detect(b"<?xml version='1.0'?>\n<other/>", Some("kdenlive")), Some(Format::Mlt), "the extension decides for other XML");
     assert_eq!(Format::from_extension(".KDENLIVE"), Some(Format::Mlt));
+    assert_eq!(Format::from_extension("mlt"), Some(Format::Mlt));
+    // The root element decides, past the declaration, comments and a document type; `<mlt` as
+    // the start of another name, or in a comment, is not an MLT document.
+    assert_eq!(detect(b"<?xml version='1.0'?>\n<!DOCTYPE mlt>\n<!-- made by hand -->\n<mlt>\n</mlt>", None), Some(Format::Mlt));
+    assert_eq!(detect(b"<?xml version='1.0'?>\n<mltfoo/>", None), None);
+    assert_eq!(detect(b"<!-- <mlt> --><other/>", None), None);
+    assert_eq!(detect(b"<?xml version='1.0'?>\n<!-- unclosed", Some("mlt")), Some(Format::Mlt), "the extension decides when the root can't be read");
     assert_eq!(Format::Mlt.extension(), "kdenlive");
     assert!(!Format::Mlt.can_export());
     assert!(Format::ALL.iter().filter(|f| **f != Format::Mlt).all(|f| f.can_export()));
