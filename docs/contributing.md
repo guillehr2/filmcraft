@@ -8,7 +8,7 @@ of the crate you will change.
 
 | | All platforms |
 |---|---|
-| Rust | stable ≥ 1.95 (edition 2024; egui 0.36 requires it), via [rustup](https://rustup.rs) |
+| Rust | stable ≥ 1.95 (edition 2024; egui 0.37 requires it), via [rustup](https://rustup.rs) |
 | wasm target | `rustup target add wasm32-unknown-unknown` (for `cargo xtask wasm`) |
 | Components | `rustup component add rustfmt clippy` |
 | ffmpeg + ffprobe (optional) | test oracle and fixture generator only; tests skip without it |
@@ -74,7 +74,7 @@ browser console instead.
 ### Building with craft-fonts
 
 Font assets live in [storytold/craft-fonts](https://github.com/storytold/craft-fonts), never in this
-repo ([standard](https://github.com/storytold/craftrules/blob/main/standards/fonts.md)). It is an optional build input, not a Cargo
+repo. It is an optional build input, not a Cargo
 dependency:
 
 ```sh
@@ -89,7 +89,8 @@ Regular, to keep the wasm small). The Japanese ones become the last fallback of 
 (`crates/ui-egui/src/theme.rs`, BIZ UDPGothic first) and fallback faces in the text engine (Gothic
 for sans text, Mincho for serif text). Without `CRAFT_FONTS_DIR`, `CRAFT_FONTS` is empty and
 FilmCraft uses its bundled and system fonts. A `CRAFT_FONTS_DIR` that is not a checkout is a build
-warning, or an error with `CRAFT_FONTS_REQUIRED=1` (release builds set both). Tests on these fonts'
+warning, or an error with `CRAFT_FONTS_REQUIRED=1` (release builds set both). With
+`CRAFT_FONTS_REQUIRED=1`, a build without `CRAFT_FONTS_DIR` is an error too. Tests on these fonts'
 glyphs skip when it is empty; when you touch fonts, run the gates both with and without it.
 
 Chinese media names and track labels use the `Hans` / `Hant` craft-fonts faces after the Japanese
@@ -278,8 +279,7 @@ In short:
 - **Fonts live in [storytold/craft-fonts](https://github.com/storytold/craft-fonts), not here.**
   Don't commit new font files to this repo (the Latin UI fonts already in `assets/fonts/` stay): add
   the font to craft-fonts (file, licence, manifest line, `ATTRIBUTION.md` row) and use it through
-  `filmcraft_text::fonts::CRAFT_FONTS`. See [Building with craft-fonts](#building-with-craft-fonts)
-  and [`craftrules/standards/fonts.md`](https://github.com/storytold/craftrules/blob/main/standards/fonts.md).
+  `filmcraft_text::fonts::CRAFT_FONTS`. See [Building with craft-fonts](#building-with-craft-fonts).
 
 For each asset file `X`, commit a sidecar `X.attribution`. This is the real one for
 `assets/fonts/Inter-Regular.ttf`:

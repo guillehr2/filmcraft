@@ -262,7 +262,14 @@ fn kdenlive_project_two_video_tracks_one_audio_track() {
     assert!(a1.muted, "hide=\"both\" on an audio track mutes it");
     assert_eq!(clips(&a1.items, rate), vec![c("River", 0, 90, 30), c("theme.wav", 120, 150, 0)]);
     assert_eq!(media_path(&imp, &a1.items[1]), "/library/music/theme.wav");
+}
 
+#[test]
+fn kdenlive_project_media_and_links() {
+    let (imp, _) = import_mlt(PROJECT);
+    let seq = only_sequence(&imp);
+    let rate = FrameRate::FPS_30;
+    let (v1, a1) = (&seq.video_tracks[0], &seq.audio_tracks[0]);
     // both halves of River: one media item, linked; the music is not linked to anything
     assert_eq!(a1.items[0].item, v1.items[0].item);
     assert!(v1.items[0].link.is_some());
@@ -279,7 +286,11 @@ fn kdenlive_project_two_video_tracks_one_audio_track() {
     assert_eq!(river.info.duration, rate.tick_of(300), "the producer's length");
     let theme = imp.project.item(a1.items[1].item).and_then(|i| i.as_media()).unwrap();
     assert!(theme.info.video.is_none(), "video_index -1");
+}
 
+#[test]
+fn kdenlive_project_report() {
+    let (_, report) = import_mlt(PROJECT);
     // what was not imported is reported, Kdenlive's internal track plumbing is not
     for needle in [
         "transition \"wipe\" was not imported",
